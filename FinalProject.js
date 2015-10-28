@@ -8,11 +8,12 @@ Known issues: If the player is punched to the left during a left dodge, the anim
 as all the relevant code is nearly identical in the right dodge version.
 Holding down a punch button while being knocked down causes queued punches to still go through, causing the opponent to 
 think you're still standing.
+//The bulk of the code results from all models and animations being written in here as opposed to imported in through an external source.
 Matthew Sziklay
 */
 
 var head;
-var lilBoxer, torso, leftLeg, rightLeg, leftArm, leftArmPivot, rightArmPivot, rightForearmPivot;
+var lilBoxer, torso, leftLeg, rightLeg, leftArm, rightArmPivot, leftArmPivot, leftForearmPivot;
   var leftForearm, leftUpperArm, leftArm;
 var enemy, enemyTorso, enemyTorso2, enemyLeftLeg, enemyRightLeg, enemyLeftArm, enemyLeftForeArm, enemyRightArm, enemyRightForeArm,
     enemyLeftBrow, enemyRightBrow;
@@ -41,14 +42,14 @@ function main() {
   renderer.setSize( canvas.width, canvas.height );
     renderer.setClearColor(0xFF0000);
   //This is the point that the cannon arm will rotate around.
-  leftArmPivot = new THREE.Object3D();
-  leftArmPivot.position.set(-2.2,2.2,0.1);
-  leftForearmPivot = new THREE.Object3D();
-  leftForearmPivot.position.set(1,1,0);
-  rightForearmPivot  = new THREE.Object3D();
-  rightForearmPivot.position.set(0,-1.4,0);
   rightArmPivot = new THREE.Object3D();
-  rightArmPivot.position.set(-2,2,-4.3);
+  rightArmPivot.position.set(-2.2,2.2,0.1);
+  rightForearmPivot = new THREE.Object3D();
+  rightForearmPivot.position.set(1,1,0);
+  leftForearmPivot  = new THREE.Object3D();
+  leftForearmPivot.position.set(0,-1.4,0);
+  leftArmPivot = new THREE.Object3D();
+  leftArmPivot.position.set(-2,2,-4.3);
   leftLegPivot = new THREE.Object3D();
   leftLegPivot.position.set(-2.5,-3,-3.5);
   rightLegPivot = new THREE.Object3D();
@@ -60,28 +61,28 @@ function main() {
   torso = createTorso();
   leftArm = new THREE.Object3D();
   leftArm.add(leftUpperArm);
-    leftArm.add(leftForearmPivot);
+    leftArm.add(rightForearmPivot);
   leftArm.position.set(-1,-2.6,-.7);
-  leftArmPivot.add(leftArm);
-  leftForearmPivot.add(leftForearm);
-  rightArmPivot.add(createRightUpperArm());
-  rightForearmPivot.add(createRightForeArm());
-  rightArmPivot.add(rightForearmPivot);
+  rightArmPivot.add(leftArm);
+  rightForearmPivot.add(leftForearm);
+  leftArmPivot.add(createRightUpperArm());
+  leftForearmPivot.add(createRightForeArm());
+  leftArmPivot.add(leftForearmPivot);
   leftLegPivot.add(createLeg());
   rightLegPivot.add(createLeg());
-  lilBoxer.add(leftArmPivot);
-  lilBoxer.add(torso);
   lilBoxer.add(rightArmPivot);
+  lilBoxer.add(torso);
+  lilBoxer.add(leftArmPivot);
   lilBoxer.add(leftLegPivot);
   lilBoxer.add(rightLegPivot);
   head = new THREE.Object3D();
   head.position.set(-2,3.3,-2.5);
   head.add(createHead());
   lilBoxer.add(head);
-    leftArmPivot.rotateZ(Math.PI/8);
-    leftForearmPivot.rotateZ(Math.PI/2);
     rightArmPivot.rotateZ(Math.PI/8);
-    rightForearmPivot.rotateZ(Math.PI/2); 
+    rightForearmPivot.rotateZ(Math.PI/2);
+    leftArmPivot.rotateZ(Math.PI/8);
+    leftForearmPivot.rotateZ(Math.PI/2); 
   scene = new THREE.Scene();
     createHealthBars();
   var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
@@ -125,7 +126,7 @@ function main() {
 
 ///////////////////////////////////////////////DRAWING ALL OBJECTS///////////////////////////////////////////////////////////
 
-function drawAudience(){
+function drawAudience(){ //This was ultimately never called due to issues on other devices. Would normally draw a plane showing an audience.
     //http://3.bp.blogspot.com/-XKnZZ8hHjTg/UoKZu4aCcjI/AAAAAAAAFQM/0f8OEcmb4nQ/s1600/audience.png
         var material = new THREE.MeshLambertMaterial({
         color:0x333333
@@ -138,7 +139,7 @@ function drawAudience(){
 }
 
 var textMat, textGeom, text;
-function drawText(){
+function drawText(){ //Draw the word FIGHT at the start of the game.
     textMat = new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: 1});
     textGeom = new THREE.TextGeometry('FIGHT!',{font: 'gentilis', size: .5, height: 0.001});
     fightGeom = textGeom;
@@ -152,15 +153,15 @@ function drawText(){
 var geom1, geom2, geom3, geom4, geom5, geom6, geom7, geom8, geom9, geom10, geom11, fightgeom;
 var text = [];
 
-function createNumberGeom(){
+function createNumberGeom(){ //Create countdown number/text geometries and objects and add them to the scene.
     var coverGeom, coverMat, cover;
     coverGeom = new THREE.PlaneGeometry(3,3);
     coverMat = new THREE.MeshBasicMaterial({color: 0x62626D});
     cover = new THREE.Mesh(coverGeom, coverMat);
     cover.position.set(39,5.5,-.7);
     cover.rotateY(-Math.PI/2); //Used to cover up the numbers in the background.
-    //scene.add(cover); //This way all the text can share the same material.
     geom1 = new THREE.TextGeometry('1',{font: 'gentilis', size: .5, height: 0.001});
+    //TODO: Figure out how to change to a for loop. This looks ugly.
     text[0] = new THREE.Mesh(geom1, textMat);
     text[0].position.set(50,6,-1.15);
     text[0].rotateY(-Math.PI/2);
@@ -223,23 +224,23 @@ function createNumberGeom(){
     scene.add(text[11]);
 }
 
-function showFightText(){
+function showFightText(){ //Start the game; Show "FIGHT!!!" then let enemy chose their first attack
     textMat.opacity = 1;
     var textTween = new TWEEN.Tween(text.position);
-    textTween.to({x:-18},800);
+    textTween.to({x:-18},800); //Tween the text towards the camera.
     textTween.start();
-    setTimeout(function(){
-        textMat.opacity=0;
+    setTimeout(function(){ //After 1.5 seconds, revert text to its original position and make invisible.
+        textMat.opacity=0; 
         text.position.x=50;
     }, 1500);
-    setTimeout(function(){
+    setTimeout(function(){ //Game is on, player may move, enemy is attacking.
         gameState=3;
         playerStatus=1;
         chooseEnemyAttack();
     }, 2200);
 }
 
-function displayTKO(){
+function displayTKO(){ //Similar to showFightText, but without game altering.
     textMat.opacity = 1;
     var textTween = new TWEEN.Tween(text[11].position);
     textTween.to({x:-18},800);
@@ -250,22 +251,22 @@ function displayTKO(){
     }, 2000);
 }
 
-function countUp(){
+function countUp(){ //Count up for either side.
     var curText = text[count];
     count++;
     textMat.opacity = 1;
     var textTween = new TWEEN.Tween(curText.position);
     textTween.to({x:-18},700);
     textTween.start();
-    if(count < 11 && enemyStatus == 4)
+    if(count < 11 && enemyStatus == 4) //If enemy is the one currently down, roll to see if he gets up.
         checkEnemyGetUp();
     var timeout = 1000;
     if(count==11)
-        timeout =3000;
-    setTimeout(function(){
+        timeout =3000; //Wait 3 seconds if count finishes.
+    setTimeout(function(){ //Reset the text's position, then repeat for next number.
         textMat.opacity=0;
         curText.position.x=50;
-        if(count < 11 && (playerStatus == 6 || enemyStatus ==4)){
+        if(count < 11 && (playerStatus == 6 || enemyStatus ==4)){ //If count hasn't hit 10, keep going. If count has displayed "KO!" end game. 
             countUp();
         }
         else if (count==11)
@@ -273,7 +274,7 @@ function countUp(){
     }, timeout);
 }
 
-function drawBoxingRing(){
+function drawBoxingRing(){ //Draw the mat, ropes, corner poles, and add them all to the scene.
     var ropeMat, ropeGeom, rope1, rope2, rope3,
         rope4, rope5, rope6, rope7, rope8, rope9;
     var groundMat, groundGeom, ground;
@@ -334,7 +335,7 @@ function drawBoxingRing(){
     return ring;
 }
 
-function createLeftArm(){
+function createLeftArm(){ //Create the left forearm arm of the player character.
     var forearm;
     forearm = new THREE.Object3D();
     var leftForeArm, leftFist;
@@ -355,7 +356,7 @@ function createLeftArm(){
     
 }
 
-function createUpperArm(){
+function createUpperArm(){ //Create left upper arm of boxer.
     var upperArm = new THREE.Object3D();
     var armMat, armGeom, arm;
     armMat = new THREE.MeshBasicMaterial({color: 0xFFDCB1});
@@ -366,7 +367,7 @@ function createUpperArm(){
     return upperArm;
 }
 
-function createHead(){
+function createHead(){ //Create boxer's head
     var head = new THREE.Object3D();
     var headGeom, headMat, headShape;
     var hairGeom, hairMat, hairShape;
@@ -393,7 +394,7 @@ function createHead(){
     return head;
 }
 
-function createTorso(){
+function createTorso(){ //Create boxer's torso.
     var boxerTorso = new THREE.Object3D();
     var torsoMat, torsoGeom, torso;
     var shortsMat, shortsGeom, shorts;
@@ -418,7 +419,7 @@ function createTorso(){
     return boxerTorso;
 }
 
-function createRightUpperArm(){
+function createRightUpperArm(){ //Create boxer's right upper arm.
     var forearm;
     forearm = new THREE.Object3D();
     var leftForeArm, leftFist;
@@ -433,7 +434,7 @@ function createRightUpperArm(){
     return(forearm);
 }
 
-function createRightForeArm(){
+function createRightForeArm(){ //Create boxer's right forearm.
   var upperArm, upperArmMat, upperArmGeom;
   var fistGeom, fistMat, fist;
     fistGeom = new THREE.BoxGeometry(1.2,1.2,1.2);
@@ -452,7 +453,7 @@ function createRightForeArm(){
   return uArm;
 }
 
-function createLeg(){
+function createLeg(){ //Create boxer's leg. Called twice in different positions.
     var leg = new THREE.Object3D();
     var uLegGeom, uLegMat, uLeg;
     var footGeom, footMat, foot;
@@ -568,9 +569,9 @@ function createEnemy(){ //Create all the object3Ds that make up our enemy.
 /////////////////////////////////////////////////////////PLAYER ANIMATIONS/////////////////////////////////////////////////////
 
 function dodgeLeft(){ //Dodge away from the opponent's attack.
-    if(!midAnimation && playerStatus< 5 && enemyStatus !=4){ //Not in the middle of an animation, not knocked down.
+    if(!midAnimation && playerStatus< 5 && enemyStatus !=4){ //Not in the middle of an animation, not knocked down, enemy not knocked down.
         midAnimation = true;
-        playerStatus = 2;
+        playerStatus = 2; //2= left dodge
         setTimeout(function () {
             if(playerStatus!=5){
             playerStatus=1; //Player returned to neutral after dodge.  
@@ -627,13 +628,13 @@ function dodgeRight(){ //Essentially the same as dodgeLeft, but moves differentl
 }
 var isBlocking = false;
 function block(){ //Enters a blocking state, reducing the player's damage taken.
-    if(!isBlocking && !midAnimation && playerStatus<5  && enemyStatus !=4){ //Play animation if not in another animation and not already blocking.
+    if(!isBlocking && !midAnimation && playerStatus<5  && enemyStatus !=4){ //Play animation if not in another animation, not already blocking, and enemy is standing.
         midAnimation = true;
         playerStatus=4;
-        var tweenA = new TWEEN.Tween(leftArmPivot.rotation);
+        var tweenA = new TWEEN.Tween(rightArmPivot.rotation);
         tweenA.to({x: -Math.PI/5, z : Math.PI/2}, 100);
         tweenA.start();
-        var tweenB = new TWEEN.Tween(rightArmPivot.rotation);
+        var tweenB = new TWEEN.Tween(leftArmPivot.rotation);
         tweenB.to({x: Math.PI/5, z : Math.PI/2},100);
         tweenB.start();
         var tweenC = new TWEEN.Tween(lilBoxer.position);
@@ -647,10 +648,10 @@ function unblock(){ //Cease blocking, returning the player to a neutral state.
     if(isBlocking){
         midAnimation = false; //Player can act immediately out of blocking.
         playerStatus=1; //Player returned to neutral.
-        var tweenA = new TWEEN.Tween(leftArmPivot.rotation);
+        var tweenA = new TWEEN.Tween(rightArmPivot.rotation);
         tweenA.to({x: 0, z : Math.PI/8}, 100);
         tweenA.start(); //Animate the boxer
-        var tweenB = new TWEEN.Tween(rightArmPivot.rotation);
+        var tweenB = new TWEEN.Tween(leftArmPivot.rotation);
         tweenB.to({x: 0, z : Math.PI/8},100);
         tweenB.start();
         isBlocking = false;
@@ -672,13 +673,13 @@ function leftBodyBlow(){ //A lower left punch.
     tweenA.to({x : 1},150);
     tweenB.to({x : 0},150);
     tweenA.chain(tweenB);
-    var tweenC = new TWEEN.Tween(rightArmPivot.rotation);
-    var tweenD = new TWEEN.Tween(rightArmPivot.rotation);
+    var tweenC = new TWEEN.Tween(leftArmPivot.rotation);
+    var tweenD = new TWEEN.Tween(leftArmPivot.rotation);
     tweenC.to({z: 2*Math.PI/3}, 150);
     tweenD.to({z: Math.PI/8}, 150);
     tweenC.chain(tweenD);
-    var tweenE = new TWEEN.Tween(rightForearmPivot.rotation); //Arm names are reversed what they should be. Will fix this.
-    var tweenF = new TWEEN.Tween(rightForearmPivot.rotation); //Left = right, right = left. Only for arms.
+    var tweenE = new TWEEN.Tween(leftForearmPivot.rotation); 
+    var tweenF = new TWEEN.Tween(leftForearmPivot.rotation);
     tweenE.to({z : 0}, 150);
     tweenF.to({z : Math.PI/2}, 150);
     tweenE.chain(tweenF);
@@ -711,13 +712,13 @@ function rightBodyBlow(){ //Essentially the same as leftBodyBlow
     tweenA.to({x : 1},150);
     tweenB.to({x : 0},150);
     tweenA.chain(tweenB);
-    var tweenC = new TWEEN.Tween(leftArmPivot.rotation);
-    var tweenD = new TWEEN.Tween(leftArmPivot.rotation);
+    var tweenC = new TWEEN.Tween(rightArmPivot.rotation);
+    var tweenD = new TWEEN.Tween(rightArmPivot.rotation);
     tweenC.to({z: 2*Math.PI/3}, 150);
     tweenD.to({z: Math.PI/8}, 150);
     tweenC.chain(tweenD);
-    var tweenE = new TWEEN.Tween(leftForearmPivot.rotation);
-    var tweenF = new TWEEN.Tween(leftForearmPivot.rotation);
+    var tweenE = new TWEEN.Tween(rightForearmPivot.rotation);
+    var tweenF = new TWEEN.Tween(rightForearmPivot.rotation);
     tweenE.to({z : 0}, 150);
     tweenF.to({z : Math.PI/2}, 150);
     tweenE.chain(tweenF);
@@ -747,13 +748,13 @@ function leftPunch(){ //A higher version of leftBodyBlow
         tweenA.to({y : 3},150);
         tweenB.to({y : 0},150);
         tweenA.chain(tweenB);
-        var tweenC = new TWEEN.Tween(rightArmPivot.rotation);
-        var tweenD = new TWEEN.Tween(rightArmPivot.rotation);
+        var tweenC = new TWEEN.Tween(leftArmPivot.rotation);
+        var tweenD = new TWEEN.Tween(leftArmPivot.rotation);
         tweenC.to({z: 2*Math.PI/3}, 150);
         tweenD.to({z: Math.PI/8}, 150);
         tweenC.chain(tweenD);
-        var tweenE = new TWEEN.Tween(rightForearmPivot.rotation);
-        var tweenF = new TWEEN.Tween(rightForearmPivot.rotation);
+        var tweenE = new TWEEN.Tween(leftForearmPivot.rotation);
+        var tweenF = new TWEEN.Tween(leftForearmPivot.rotation);
         tweenE.to({z : 0}, 150);
         tweenF.to({z : Math.PI/2}, 150);
         tweenE.chain(tweenF);
@@ -783,13 +784,13 @@ function rightPunch(){ //Essentially the same as leftPunch
         tweenA.to({y : 3},150);
         tweenB.to({y : 0},150);
         tweenA.chain(tweenB);
-        var tweenC = new TWEEN.Tween(leftArmPivot.rotation);
-        var tweenD = new TWEEN.Tween(leftArmPivot.rotation);
+        var tweenC = new TWEEN.Tween(rightArmPivot.rotation);
+        var tweenD = new TWEEN.Tween(rightArmPivot.rotation);
         tweenC.to({z: 2*Math.PI/3}, 150);
         tweenD.to({z: Math.PI/8}, 150);
         tweenC.chain(tweenD);
-        var tweenE = new TWEEN.Tween(leftForearmPivot.rotation);
-        var tweenF = new TWEEN.Tween(leftForearmPivot.rotation);
+        var tweenE = new TWEEN.Tween(rightForearmPivot.rotation);
+        var tweenF = new TWEEN.Tween(rightForearmPivot.rotation);
         tweenE.to({z : 0}, 150);
         tweenF.to({z : Math.PI/2}, 150);
         tweenE.chain(tweenF);
@@ -931,10 +932,10 @@ function playerWinAnimation(){
     tweenRot.to({y:Math.PI},500);
     tweenRot.start();
     tweenPos.start();
-    var tweenA = new TWEEN.Tween(leftArmPivot.rotation);
-    var tweenA2 = new TWEEN.Tween(leftArmPivot.rotation);
-    var tweenB = new TWEEN.Tween(rightArmPivot.rotation);
-    var tweenB2 = new TWEEN.Tween(rightArmPivot.rotation);
+    var tweenA = new TWEEN.Tween(rightArmPivot.rotation);
+    var tweenA2 = new TWEEN.Tween(rightArmPivot.rotation);
+    var tweenB = new TWEEN.Tween(leftArmPivot.rotation);
+    var tweenB2 = new TWEEN.Tween(leftArmPivot.rotation);
     var tweenE = new TWEEN.Tween(lilBoxer.position);
     var tweenE2 = new TWEEN.Tween(lilBoxer.position);
     tweenA.to({z:3*Math.PI/4},200);
@@ -949,8 +950,8 @@ function playerWinAnimation(){
     tweenE2.to({y:0},200);
     tweenE.chain(tweenE2);
     tweenE2.chain(tweenE);
-    var tweenC = new TWEEN.Tween(leftForearmPivot.rotation);
-    var tweenD = new TWEEN.Tween(rightForearmPivot.rotation);
+    var tweenC = new TWEEN.Tween(rightForearmPivot.rotation);
+    var tweenD = new TWEEN.Tween(leftForearmPivot.rotation);
     tweenC.to({z:Math.PI/3},200);
     tweenD.to({z:Math.PI/3},200);
     setTimeout(function(){
@@ -1225,7 +1226,6 @@ function enemyDelayedRightPunch(){ //Same as above.
 }
 
 function enemySpecial(){
-//    alert("\"BULK SMASH!!!\"");
     enemyStatus=3;
     var tweenA = new TWEEN.Tween(enemy.position);
     var tweenA2 = new TWEEN.Tween(enemy.position);
@@ -1318,10 +1318,10 @@ function enemyToNeutral(time){ //Return enemy to neutral position.
     }
 }
 
-function enemyHit(){
+function enemyHit(){ //Bulk's hit animation.
     enemyHealth-=difficulty; //Normally 1. 20 for testing.
     updateHealthBars();
-    enemyLeftBrow.rotation.x = -Math.PI/4;
+    enemyLeftBrow.rotation.x = -Math.PI/4; //BULK HURT EYEBROWS! Used to communnicate when Bulk has been hit and can continue being hit.
     enemyRightBrow.rotation.x = Math.PI/4;
     tweenEnemyPos = new TWEEN.Tween(enemy.position);
     var tweenEnemyPos2 = new TWEEN.Tween(enemy.position);
@@ -1337,7 +1337,7 @@ function enemyHit(){
    // tweenEnemyRot.start(); This one looks weird currently. Gonna figure it out for the finished ver.
 }
 
-function enemyBlock(){
+function enemyBlock(){ //Bulk's blocking animation.
     enemyLeftBrow.rotation.x = Math.PI/6;
     enemyRightBrow.rotation.x = -Math.PI/6;
     enemyBlocking=true;
@@ -1359,7 +1359,7 @@ function enemyBlock(){
     
 }
 
-function enemyFallDown(){
+function enemyFallDown(){ //Bulk being knocked down animation.
     enemyKDs++;
     enemyToNeutral(100);
     var tweenEnemyPos = new TWEEN.Tween(enemy.position);
@@ -1386,7 +1386,7 @@ function enemyFallDown(){
     
 }
 
-function checkEnemyGetUp(){
+function checkEnemyGetUp(){ //The higher the count, the more likely Bulk will rise. Very small chance he won't by 10.
     var r = Math.random();
     if ((r >=0.5 && count == 9 || count == 10)|| (count < 3 && r >= .9) || ((count ==4 || count == 5) && r >=.85) || (count == 6 && r >=.8) || ((count==7 || count==8) && r>0.75)){
         enemyStatus=1;
@@ -1403,7 +1403,7 @@ function checkEnemyGetUp(){
 }
 
 ////////////////////////////////////////////////GAME LOGIC///////////////////////////////////////////////////////////////
-function checkPlayerDodge(attack){ 
+function checkPlayerDodge(attack){ //General structure: Check attack's number against player's dodge status. If hit, take damage. If blocked, take damage.
     var modifier=0; //0 = easy
     if(difficulty == 2)
         modifier = 5;
@@ -1452,13 +1452,13 @@ function checkPlayerDodge(attack){
     updateHealthBars();
 }
 var enemyMidAttack = false;
-function chooseEnemyAttack(){
-    if(playerStatus!=6 && enemyStatus!=4 && !enemyMidAttack){ //Only select an attack if both fighters are standing.
-    enemyToNeutral(0);
+function chooseEnemyAttack(){ 
+    if(playerStatus!=6 && enemyStatus!=4 && !enemyMidAttack){ //Only select an attack if both fighters are standing and enemy isn't already attacking.
+    enemyToNeutral(0); //Immediately return to neutral.
     enemyMidAttack=true;
-    enemyLeftBrow.rotation.x = Math.PI/6;
+    enemyLeftBrow.rotation.x = Math.PI/6; //BULK ANGRY EYEBROWS!
     enemyRightBrow.rotation.x = -Math.PI/6;
-    var r = Math.random();
+    var r = Math.random(); //Randomly choose next attack.
     if(r<= 0.225)
         enemyDelayedLeftPunch();
     if(r> 0.225 && r<= 0.45)
@@ -1487,7 +1487,7 @@ function checkEnemyBlock(){
     }
 }
 var playerHB, enemyHB, playerOutline, enemyOutline;
-function createHealthBars(){
+function createHealthBars(){ //Create healthbars and the black bars underneath them.
     var playerHBGeom, playerHBMat;
     var enemyHBGeom, enemyHBMat;
     var outlineGeom, outlineMat, playerOutline, enemyOutline;
@@ -1516,7 +1516,7 @@ function createHealthBars(){
 }
 
 function updateHealthBars(){
-    if(playerHealth <= 0){
+    if(playerHealth <= 0){ //Eliminate "negaitve" health.
         playerStatus=6;
         playerHealth=0;
     }
@@ -1539,7 +1539,6 @@ function resumeFight(){
         midAnimation=true;
         playerHealth=75;
         updateHealthBars();
-        //Display "FIGHT!"
         setTimeout(function () {
             midAnimation=false;
             chooseEnemyAttack();
@@ -1548,7 +1547,7 @@ function resumeFight(){
 }
 
 function endGame(){ //End the game and inform player of their win/loss.
-    if(playerKDs ==3 || enemyKDs == 3)
+    if(playerKDs ==3 || enemyKDs == 3) //Show the appropriate text and animation
         displayTKO();
     if(playerStatus ==6)
         enemyWinAnimation();
