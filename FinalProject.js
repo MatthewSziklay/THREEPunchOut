@@ -991,7 +991,7 @@ function playIntroAnimation(){
     setTimeout(function(){
         var parsedOption = 0;
         do{
-            var option = prompt("You enter the ring looking to make a name for yourself when suddenly, The Incredible Bulk reveals himself to be your opponent!\n\"BULK CRUSH PUNY HUMAN!!!\" the green giant bellows. How do you respond?\n" + "1: Pffft, whatever. (Hard Mode)\n" + "2: Bring it on! (Normal Mode)\n" + "3: I don't wanna die!!! (Easy Mode)");
+            var option = prompt("(Type the number for your dialogue choice)\nYou enter the ring looking to make a name for yourself when suddenly, The Incredible Bulk reveals himself to be your opponent!\n\"BULK CRUSH PUNY HUMAN!!!\" the green giant bellows. How do you respond?\n" + "1: Pffft, whatever. (Hard Mode)\n" + "2: Bring it on! (Normal Mode)\n" + "3: I don't wanna die!!! (Easy Mode)");
             parsedOption = parseInt(option, 10);
         } while(parsedOption != 1 && parsedOption !=2 && parsedOption !=3);
         difficulty = parsedOption;
