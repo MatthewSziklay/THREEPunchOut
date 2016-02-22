@@ -1509,7 +1509,7 @@ function createHealthBars(){
     enemyOutline.rotateY(-Math.PI/2);
     playerOutline.rotateY(-Math.PI/2);
     playerHB.rotateY(-Math.PI/2);
-    playerHB.position.set(0,15,-10);
+    playerHB.position.set(-0.001,15,-10);
     playerOutline.position.set(0.0001,15,-10);
     enemyHB.position.set(0,15, 8);
     enemyOutline.position.set(0.00001,15,8);
@@ -1526,7 +1526,7 @@ function updateHealthBars(){
         enemyHealth=0;
     }
   playerHB.scale.x = playerHealth/playerMaxHealth;
-    playerHB.position.set(0,15,-10-5*((playerMaxHealth-playerHealth)/playerMaxHealth));
+    playerHB.position.set(-0.001,15,-10-5*((playerMaxHealth-playerHealth)/playerMaxHealth));
     enemyHB.scale.x = enemyHealth/enemyMaxHealth;
     enemyHB.position.set(0,15,8+5*((enemyMaxHealth-enemyHealth)/enemyMaxHealth));
 }
